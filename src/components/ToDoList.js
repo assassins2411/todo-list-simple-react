@@ -1,45 +1,65 @@
-import React,{useState} from 'react'
-import ToDo from './ToDo'
-import ToDoForm from './ToDoForm'
+import React, { useState } from 'react';
+import TodoForm from './TodoForm';
+import Todo from './Todo';
 
-function ToDoList() {
-    const [todos, settodos] = useState([])
-    const addTodo=todo=>{
-        if(!todo.text || /^\s*$/.test(todo.text)){
-            return
+function TodoList() {
+  // array
+  const [todos, setTodos] = useState([]);
+
+  const addTodo = todo => {
+
+    if (!todo.text || /^\s*$/.test(todo.text)) {
+      return;
+    }
+    // appending the array of new todo content with older content
+    const newTodos = [todo, ...todos];
+    // setting the state
+    setTodos(newTodos);
+    // by using the spread operator only properties of elements are given
+    console.log(...todos);
+  };
+
+  const updateTodo = (todoId, newValue) => {
+    if (!newValue.text || /^\s*$/.test(newValue.text)) {
+      return;
+    }
+
+    setTodos(
+      (prev) => prev.map(
+        item => (item.id === todoId ? newValue : item)
+      )
+    );
+  };
+
+  const removeTodo = id => {
+    // filter() is used to filter the array items on given condition
+    const removedArr = [...todos].filter(todo => todo.id !== id);
+    // the element which are not equal desired id are passed to the removedArr []
+    setTodos(removedArr);
+  };
+
+  const completeTodo = id => {
+    let updatedTodos = todos.map(todo => {
+        if (todo.id === id) {
+          todo.isComplete = !todo.isComplete;
         }
-        const newTodos=[todo, ...todos];
-        settodos(newTodos)
-        console.log(...todos);
-    }
-    const removeTodo=id=>{
-        const removeArr=[...todos].filter(todo => todo.id!==id)
-        settodos(removeArr)
-    }
-    const updateTodo=(todoId,newValue)=>{
-        if(!newValue.text || /^\s*$/.test(newValue.text)){
-            return
-        }
-        
-        settodos(prev=>prev.map(item=>(item.id===todoId?newValue:item)))
-    }
-    const completeTodo=id=>{
-        let updatedTodos = todos.map(todo=>{
-            if(todo.id===id){
-                todo.isComplete=!todo.isComplete
-            }
-            return todo;
-        })
-        settodos(updatedTodos)
-    }
-    return (
-        <div>
-            <h1>what the plan for today</h1>
-            <ToDoForm onSubmit={addTodo}/>
-            <ToDo todos={todos}
-            completeTodo={completeTodo} removeTodo={removeTodo} updateTodo={updateTodo}/>
-        </div>
-    )
+        return todo;
+      });
+    setTodos(updatedTodos);
+  };
+
+  return (
+    <>
+      <h1>What's the Plan for Today?</h1>
+      <TodoForm onSubmit={addTodo} />
+      <Todo
+        todos={todos}
+        completeTodo={completeTodo}
+        removeTodo={removeTodo}
+        updateTodo={updateTodo}
+      />
+    </>
+  );
 }
 
-export default ToDoList
+export default TodoList;
